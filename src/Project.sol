@@ -69,9 +69,14 @@ contract Project {
 
     function refund () public setGoalStatus() {
         require(contributions[msg.sender] > 0, "No contribution to refund");
+        uint amountToRefund = contributions[msg.sender]/2;
         require(goalFailed, "Goal not failed");
-        (bool success,) = payable(msg.sender).call{value: contributions[msg.sender]}("");
-        require(success, "Refund failed");
+        (bool success,) = payable(msg.sender).call{value: amountToRefund}("");
+        
+        // Everytime we refund the user, we also refund the creator. It's only fair.
+        // Even if the call to the user fails, we still refund the creator.
+        (success,) = payable(creator).call{value: amountToRefund}("");
+        require(success, "The creator could not get the money failed");
         contributions[msg.sender] = 0;
     }  
 
