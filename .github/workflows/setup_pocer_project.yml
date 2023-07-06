@@ -6,6 +6,9 @@ on: [push]
 jobs:
   check:
 
+    permissions:
+      contents: write
+
     name: Foundry project
     runs-on: ubuntu-latest
     steps:
@@ -43,3 +46,11 @@ jobs:
       #     git push
     
       - uses: stefanzweifel/git-auto-commit-action@v4
+
+      - name: "Run if changes have been detected"
+        if: steps.auto-commit-action.outputs.changes_detected == 'true'
+        run: echo "Changes!"
+    
+      - name: "Run if no changes have been detected"
+        if: steps.auto-commit-action.outputs.changes_detected == 'false'
+        run: echo "No Changes!
