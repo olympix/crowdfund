@@ -32,8 +32,8 @@ contract Project {
             goalFailed = true;
             _;
         } else if (address(this).balance >= goal) {
-            goalAchieved = true;
             _;
+            goalAchieved = true;
         }else{
             _;
         }

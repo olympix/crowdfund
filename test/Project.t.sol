@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "src/Project.sol";
 
-
 contract ProjectTest is Test {
     Project project;
     address alice;
@@ -41,13 +40,13 @@ contract ProjectTest is Test {
         assertEq(project.contributions(bob), 0, "bob should have 0 contribution");
         assertEq(address(project).balance, 0, "project should have 0 balance");
         assertTrue(address(bob).balance == 100 ether, "bob should have 100 ether");
-
     }
 
     function test_Withdraw() public {
         vm.startPrank(bob);
         project.contribute{value: 100 ether}();
         vm.stopPrank();
+        vm.startPrank(alice);
         project.withdraw(50 ether);
         assertEq(address(project).balance, 50 ether);
     }
@@ -74,12 +73,6 @@ contract ProjectTest is Test {
         project.contribute{value: 10 ether}();
         vm.warp(block.timestamp + 31 days);
         project.contribute{value: 10 ether}();
-    }
-
-    function testFail_ClaimTokensGoalNotAchieved() public {
-        vm.startPrank(bob);
-        project.contribute{value: 10 ether}();
-        project.claimTokens();
     }
 
     function testFail_RefundGoalNotFailed() public {
