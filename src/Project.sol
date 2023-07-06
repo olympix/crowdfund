@@ -51,8 +51,7 @@ contract Project {
         contributions[msg.sender] += msg.value;
 
         console.log('contributions[msg.sender] = ', contributions[msg.sender]);
-        uint newTokensOwed = contributions[msg.sender] / 1 ether;
-        tokensOwed[msg.sender] = newTokensOwed;
+        tokensOwed[msg.sender] = contributions[msg.sender] / 1 ether;
 
         if (address(this).balance >= goal && !goalFailed) {
             goalAchieved = true;

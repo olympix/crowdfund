@@ -30,7 +30,7 @@ contract TestReentrancy is Test {
     }
 
     receive() external payable {
-        console.log('current balance = ', address(this).balance);
+        // console.log('current balance = ', address(this).balance);
         try project.refund() {
 
         } catch (bytes memory) {

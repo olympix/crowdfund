@@ -5,28 +5,92 @@ import "forge-std/Test.sol";
 import "src/Project.sol";
 
 
-contract ProjectTest is DSTest {
+contract ProjectTest is Test {
     Project project;
-    address owner;
+    address alice;
+    address bob;
+
     function setUp() public {
-        project = new Project(100 ether, "Test", "TST", address(this));
-        owner = address(this);
+        alice = address(0x1);
+        bob = address(0x2);
+        // vm send 100 ether to alice and bob
+        vm.deal(alice, 100 ether);
+        vm.deal(bob, 100 ether);
+
+        project = new Project(100 ether, "Project", "PJT", alice);
     }
 
-    function test_contribute() public {
-        project.contribute{value: 1 ether}();
-        assertTrue(project.contributions(address(this)) == 1 ether, "Contributions should be 1 ether");
+    function test_Contribute() public {
+        vm.startPrank(bob);
+        project.contribute{value: 10 ether}();
+        assertEq(project.contributions(bob), 10 ether);
     }
 
-    function test_claimTokens() public {
-        project.contribute{value: 1.2 ether}();
+    function test_ClaimTokens() public {
+        vm.startPrank(bob);
+        project.contribute{value: 10 ether}();
         project.claimTokens();
-        assertTrue(project.tokensOwed(address(this)) == 1 ether / 1 ether, "Tokens owed should be 1");
+        assertEq(project.tokensClaimed(bob), 10);
     }
 
-    
+    function test_Refund() public {
+        vm.startPrank(bob);
+        project.contribute{value: 10 ether}();
+        vm.warp(block.timestamp + 31 days);
+        project.refund();
+        assertEq(project.contributions(bob), 0, "bob should have 0 contribution");
+        assertEq(address(project).balance, 0, "project should have 0 balance");
+        assertTrue(address(bob).balance == 100 ether, "bob should have 100 ether");
 
-    function onERC721Received(address to, address from, uint tokenId, bytes memory data) pure public returns (bytes4) {
-        return bytes4(keccak256("onERC721Received(address,address,uint256,bytes)"));
+    }
+
+    function test_Withdraw() public {
+        vm.startPrank(bob);
+        project.contribute{value: 100 ether}();
+        vm.stopPrank();
+        project.withdraw(50 ether);
+        assertEq(address(project).balance, 50 ether);
+    }
+
+    function testFail_WithdrawNotCreator() public {
+        vm.startPrank(bob);
+        project.contribute{value: 100 ether}();
+        project.withdraw(50 ether);
+    }
+
+    function testFail_WithdrawGoalNotAchieved() public {
+        vm.startPrank(alice);
+        project.withdraw(50 ether);
+    }
+
+    function testFail_ContributeGoalAchieved() public {
+        vm.startPrank(bob);
+        project.contribute{value: 100 ether}();
+        project.contribute{value: 10 ether}();
+    }
+
+    function testFail_ContributeGoalFailed() public {
+        vm.startPrank(bob);
+        project.contribute{value: 10 ether}();
+        vm.warp(block.timestamp + 31 days);
+        project.contribute{value: 10 ether}();
+    }
+
+    function testFail_ClaimTokensGoalNotAchieved() public {
+        vm.startPrank(bob);
+        project.contribute{value: 10 ether}();
+        project.claimTokens();
+    }
+
+    function testFail_RefundGoalNotFailed() public {
+        vm.startPrank(bob);
+        project.contribute{value: 10 ether}();
+        project.refund();
+    }
+
+    function testFail_RefundNoContribution() public {
+        vm.startPrank(bob);
+        vm.warp(block.timestamp + 31 days);
+        project.refund();
     }
 }
