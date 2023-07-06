@@ -1,0 +1,44 @@
+name: setup_pocer_project
+
+on: [push]
+
+
+jobs:
+  check:
+    strategy:
+      fail-fast: true
+
+    name: Foundry project
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge build --sizes
+        id: build
+
+      - name : Insert exploits/, test/ into the project
+        run: |
+          [ -d "test" ] || mkdir test/
+          [ -d "exploits" ] || mkdir exploits/
+      
+      - uses: crytic/slither-action@v0.3.0
+        with:
+          ignore-compile:  true
+          slither-args: "--json slither_output.json"
+
+      - name : add, commit and push
+        run: |
+          git add .
+          git commit -m "[startup action] add exploits/ and test/, and slither_output"
+          git push
+    
