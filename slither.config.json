@@ -1,0 +1,4 @@
+{
+ "detectors_to_exclude": "incorrect-modifier,shadowing-builtin,shadowing-local,uninitialized-fptr-cst,variable-scope,void-cst,calls-loop,events-access,events-maths,incorrect-unary,missing-zero-check,reentrancy-benign,reentrancy-events,timestamp,assembly,assert-state-change,boolean-equal,cyclomatic-complexity,deprecated-standards,erc20-indexed,function-init-state,incorrect-using-for,low-level-calls,missing-inheritance,naming-convention,pragma,redundant-statements,solc-version,unimplemented-functions,unused-state,costly-loop,dead-code,reentrancy-unlimited-gas,similar-names,too-many-digits,cache-array-length,constable-states,external-function,immutable-states,var-read-using-this",
+ "filter_paths": "(lib/|test/)"
+}
