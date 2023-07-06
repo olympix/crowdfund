@@ -55,8 +55,8 @@ contract TestReentrancy is Test {
 contract Hacker {
 
     receive() external payable {
-        if (msg.sender.balance > 0) {
-            Project proj = Project(msg.sender);
+        Project proj = Project(msg.sender);
+        if (msg.sender.balance > proj.contributions(address(this))) {
             proj.refund();
         }
     }
