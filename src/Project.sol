@@ -69,9 +69,10 @@ contract Project {
     function refund () public setGoalStatus() {
         require(contributions[msg.sender] > 0, "No contribution to refund");
         require(goalFailed, "Goal not failed");
-        (bool success,) = payable(msg.sender).call{value: contributions[msg.sender]}("");
-        require(success, "Refund failed");
+        uint refundAmount = contributions[msg.sender];
         contributions[msg.sender] = 0;
+        (bool success,) = payable(msg.sender).call{value: refundAmount}("");
+        require(success, "Refund failed");
     }  
 
     function withdraw(uint amount) public onlyCreator() setGoalStatus() {

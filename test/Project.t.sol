@@ -37,6 +37,8 @@ contract ProjectTest is Test {
         project.contribute{value: 10 ether}();
         vm.warp(block.timestamp + 31 days);
         project.refund();
+        vm.stopPrank();
+        console.log('bob balance = ', address(bob).balance / 1 ether);
         assertEq(project.contributions(bob), 0, "bob should have 0 contribution");
         assertEq(address(project).balance, 0, "project should have 0 balance");
         assertTrue(address(bob).balance == 100 ether, "bob should have 100 ether");
