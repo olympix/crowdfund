@@ -33,7 +33,6 @@ jobs:
       
       - uses: crytic/slither-action@v0.3.0
         with:
-          ignore-compile:  true
           slither-args: "--json slither_output.json"
 
       - name : add, commit and push
