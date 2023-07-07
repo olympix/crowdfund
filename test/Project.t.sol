@@ -134,6 +134,10 @@ contract ProjectTest is Test {
         vm.expectRevert('Withdraw failed');
         DoubleR.withdrawProject(proj, 100 ether);
     }
+
+    function invariant_GoalNotAchievedAndFailed() public {
+        assertTrue(!(project.goalAchieved() && project.goalFailed()));
+    }
 }
 
 contract RecieveRevert {
