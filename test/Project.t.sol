@@ -38,7 +38,6 @@ contract ProjectTest is Test {
         vm.warp(block.timestamp + 31 days);
         project.refund();
         vm.stopPrank();
-        console.log('bob balance = ', address(bob).balance / 1 ether);
         assertEq(project.contributions(bob), 0, "bob should have 0 contribution");
         assertEq(address(project).balance, 0, "project should have 0 balance");
         assertTrue(address(bob).balance == 100 ether, "bob should have 100 ether");
@@ -87,5 +86,10 @@ contract ProjectTest is Test {
         vm.startPrank(bob);
         vm.warp(block.timestamp + 31 days);
         project.refund();
+    }
+
+    function testFail_ContributeNotEnoughEth() public {
+        vm.startPrank(bob);
+        project.contribute{value: 0.001 ether}();
     }
 }

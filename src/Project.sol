@@ -50,7 +50,6 @@ contract Project {
         require(!(goalAchieved || goalFailed), "Goal already achieved or failed");
         contributions[msg.sender] += msg.value;
 
-        console.log('contributions[msg.sender] = ', contributions[msg.sender]);
         tokensOwed[msg.sender] = contributions[msg.sender] / 1 ether;
 
         if (address(this).balance >= goal && !goalFailed) {
