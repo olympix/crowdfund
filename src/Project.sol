@@ -61,10 +61,10 @@ contract Project {
     function claimTokens () public  {
         setGoalStatus();
         uint numTokensToMint = tokensOwed[msg.sender] - tokensClaimed[msg.sender];
+        tokensClaimed[msg.sender] += numTokensToMint;
         for (uint i = 0; i < numTokensToMint; i++) {
             nft.mint(msg.sender);
         }
-        tokensClaimed[msg.sender] += numTokensToMint;
     }
 
     function refund () public  {
