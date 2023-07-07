@@ -25,17 +25,13 @@ contract Project {
         _;
     }
 
-    modifier setGoalStatus () {
+    function setGoalStatus() private {
         if(goalAchieved || goalFailed) {
-            _;
+            return;
         } else if (block.timestamp > timeCreated + 30 days) {
             goalFailed = true;
-            _;
         } else if (address(this).balance >= goal) {
-            _;
             goalAchieved = true;
-        }else{
-            _;
         }
     }
 
@@ -45,19 +41,25 @@ contract Project {
         creator = _creator;
     }
 
-    function contribute () public payable setGoalStatus() {
+    function contribute () public payable {
+        
+        
+        if (block.timestamp > timeCreated + 30 days) {
+            console.log('i am here');
+            goalFailed = true;
+        } 
+        
         require(msg.value >= 0.01 ether, "Not enough eth");
         require(!(goalAchieved || goalFailed), "Goal already achieved or failed");
         contributions[msg.sender] += msg.value;
 
         tokensOwed[msg.sender] = contributions[msg.sender] / 1 ether;
 
-        if (address(this).balance >= goal && !goalFailed) {
-            goalAchieved = true;
-        }
+        setGoalStatus();
     }
 
-    function claimTokens () public setGoalStatus() {
+    function claimTokens () public  {
+        setGoalStatus();
         uint numTokensToMint = tokensOwed[msg.sender] - tokensClaimed[msg.sender];
         for (uint i = 0; i < numTokensToMint; i++) {
             nft.mint(msg.sender);
@@ -65,7 +67,8 @@ contract Project {
         tokensClaimed[msg.sender] += numTokensToMint;
     }
 
-    function refund () public setGoalStatus() {
+    function refund () public  {
+        setGoalStatus();
         require(contributions[msg.sender] > 0, "No contribution to refund");
         require(goalFailed, "Goal not failed");
         uint refundAmount = contributions[msg.sender];
@@ -74,7 +77,8 @@ contract Project {
         require(success, "Refund failed");
     }  
 
-    function withdraw(uint amount) public onlyCreator() setGoalStatus() {
+    function withdraw(uint amount) public onlyCreator() {
+        setGoalStatus();
         require(goalAchieved, "Goal not achieved");
         require(amount <= address(this).balance, "Not enough eth");
         (bool success,) = payable(creator).call{value: amount}("");
