@@ -15,20 +15,12 @@ contract CrowdFunder is ERC721 {
         _;
     }
 
-    constructor (string memory name, string memory symbol, address _project) ERC721(name, symbol) {
-        project = _project;
+    constructor (string memory name, string memory symbol) ERC721(name, symbol) {
+        project = msg.sender;
     }
 
     function mint (address to) public onlyProject() {
         _safeMint(to, _currentTokenId);
         _currentTokenId++;
     }
-
 }
-        
-
-
-
-
-
-

@@ -37,7 +37,7 @@ contract Project {
 
     constructor (uint _goal, string memory _name, string memory _symbol, address _creator) {
         goal = _goal;
-        nft = new CrowdFunder(_name, _symbol, address(this));
+        nft = new CrowdFunder(_name, _symbol);
         creator = _creator;
     }
 
@@ -45,7 +45,6 @@ contract Project {
         
         
         if (block.timestamp > timeCreated + 30 days) {
-            console.log('i am here');
             goalFailed = true;
         } 
         
@@ -83,5 +82,9 @@ contract Project {
         require(amount <= address(this).balance, "Not enough eth");
         (bool success,) = payable(creator).call{value: amount}("");
         require(success, "Withdraw failed");
+    }
+
+    receive() external payable {
+        contribute();
     }
 }
