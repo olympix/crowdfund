@@ -14,6 +14,9 @@ contract Project {
     bool public goalFailed = false;
     bool public goalAchieved = false;
     
+
+    event GoalAchieved(address indexed creator, uint goal);
+
     CrowdFunder nft;
 
     mapping (address => uint) public contributions;
@@ -53,8 +56,8 @@ contract Project {
         console.log('contributions[msg.sender] = ', contributions[msg.sender]);
         uint newTokensOwed = contributions[msg.sender] / 1 ether;
         tokensOwed[msg.sender] = newTokensOwed;
-
         if (address(this).balance >= goal && !goalFailed) {
+            emit GoalAchieved(creator, goal);
             goalAchieved = true;
         }
     }

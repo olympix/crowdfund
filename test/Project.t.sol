@@ -24,6 +24,11 @@ contract ProjectTest is DSTest {
         assertTrue(project.tokensOwed(address(this)) == 1 ether / 1 ether, "Tokens owed should be 1");
     }
 
+    function test_GoalAchieved() public {
+        project.contribute{value: 100 ether}();
+        assertTrue(project.goalAchieved(), "Goal should be achieved");
+    }
+
     
 
     function onERC721Received(address to, address from, uint tokenId, bytes memory data) pure public returns (bytes4) {
