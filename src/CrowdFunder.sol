@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
-import "openzeppelin-contracts/token/ERC721/ERC721.sol";
-import "./Project.sol";
+import 'openzeppelin-contracts/token/ERC721/ERC721.sol';
+import './Project.sol';
 
 
 contract CrowdFunder is ERC721 {
@@ -11,7 +11,7 @@ contract CrowdFunder is ERC721 {
     uint private _currentTokenId = 0;
 
     modifier onlyProject () {
-        require(msg.sender == address(project), "Only project can call this function");
+        require(msg.sender == address(project), 'Only project can call this function');
         _;
     }
 
@@ -20,7 +20,10 @@ contract CrowdFunder is ERC721 {
     }
 
     function mint (address to) public onlyProject() {
-        _safeMint(to, _currentTokenId);
-        _currentTokenId++;
+        _safeMint(to, _currentTokenId); /* PLEASE HIT THIS LINE */
+        _currentTokenId++;  /* PLEASE HIT THIS LINE */
+    }
+
+    function recieve() public payable {
     }
 }

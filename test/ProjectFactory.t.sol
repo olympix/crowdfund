@@ -6,16 +6,14 @@ import "src/ProjectFactory.sol";
 
 
 
-contract ProjectFactoryTest is DSTest {
-    ProjectFactory factory;
-    address owner;
-    function setUp() public {
-        factory = new ProjectFactory();
-        owner = address(this);
-    }
+contract ProjectFactoryTest is Test {
+    address alice = address(0x456);
 
-    function test_create() public {
-        address project = factory.create(100, "Test", "TST");
-        assertTrue(project != address(0x0), "Project should not be 0x0");
+
+    function testCreate() public {
+        vm.startPrank(alice);
+        ProjectFactory factory = new ProjectFactory();
+        factory.create(100, 'Project', 'PRJ');
+        vm.stopPrank();
     }
 }

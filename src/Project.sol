@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
-import "./CrowdFunder.sol";
-import "forge-std/console.sol";
+import './CrowdFunder.sol';
+import 'forge-std/console.sol';
 
 contract Project {
 
@@ -21,7 +21,7 @@ contract Project {
     mapping (address => uint) public tokensClaimed;
 
     modifier onlyCreator() {
-        require(msg.sender == creator, "Only creator can call this function");
+        require(msg.sender == creator, 'Only creator can call this function');
         _;
     }
 
@@ -43,13 +43,12 @@ contract Project {
 
     function contribute () public payable {
         
-        
         if (block.timestamp > timeCreated + 30 days) {
             goalFailed = true;
         } 
         
-        require(msg.value >= 0.01 ether, "Not enough eth");
-        require(!(goalAchieved || goalFailed), "Goal already achieved or failed");
+        require(msg.value >= 0.01 ether, 'Not enough eth');
+        require(!(goalAchieved || goalFailed), 'Goal already achieved or failed');
         contributions[msg.sender] += msg.value;
 
         tokensOwed[msg.sender] = contributions[msg.sender] / 1 ether;
@@ -68,20 +67,20 @@ contract Project {
 
     function refund () public  {
         setGoalStatus();
-        require(contributions[msg.sender] > 0, "No contribution to refund");
-        require(goalFailed, "Goal not failed");
+        require(contributions[msg.sender] > 0, 'No contribution to refund');
+        require(goalFailed, 'Goal not failed');
         uint refundAmount = contributions[msg.sender];
         contributions[msg.sender] = 0;
-        (bool success,) = payable(msg.sender).call{value: refundAmount}("");
-        require(success, "Refund failed");
+        (bool success,) = payable(msg.sender).call{value: refundAmount}('');
+        require(success, 'Refund failed');
     }  
 
     function withdraw(uint amount) public onlyCreator() {
         setGoalStatus();
-        require(goalAchieved, "Goal not achieved");
-        require(amount <= address(this).balance, "Not enough eth");
-        (bool success,) = payable(creator).call{value: amount}("");
-        require(success, "Withdraw failed");
+        require(goalAchieved, 'Goal not achieved');
+        require(amount <= address(this).balance, 'Not enough eth');
+        (bool success,) = payable(creator).call{value: amount}('');
+        require(success, 'Withdraw failed');
     }
 
     receive() external payable {
